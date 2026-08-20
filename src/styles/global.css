@@ -1,0 +1,309 @@
+/* prem-ium.inc contact card — ember palette, inherited from prem-ium.online
+   so the card and the main site read as one brand. */
+:root {
+  --bg-rgb: 250 247 242;
+  --ink-rgb: 22 19 15;
+  --ink2-rgb: 91 87 80;
+  --card-rgb: 255 255 255;
+  --border-rgb: 231 224 212;
+  --accent-rgb: 178 60 46;
+  --pop-rgb: 224 138 60;
+
+  --bg: rgb(var(--bg-rgb));
+  --ink: rgb(var(--ink-rgb));
+  --ink2: rgb(var(--ink2-rgb));
+  --card: rgb(var(--card-rgb));
+  --border: rgb(var(--border-rgb));
+  --accent: rgb(var(--accent-rgb));
+  --pop: rgb(var(--pop-rgb));
+
+  --font-d: 'Fraunces', Georgia, serif;
+  --font-b: 'Inter', system-ui, -apple-system, sans-serif;
+  --btn-radius: 99px;
+  --shadow-1: 0 10px 28px rgba(0, 0, 0, .09);
+  --eyebrow-ls: 2.5px;
+  --gutter: clamp(1.25rem, 5vw, 3.5rem);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-b);
+  line-height: 1.55;
+  overflow-x: hidden;
+}
+
+a { color: inherit; }
+
+/* ---------- the 3D room canvas ---------- */
+#room {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  /* until three.js paints, show a warm ground so there is never a white flash */
+  background: linear-gradient(160deg, #f7efe2 0%, #efe2cf 55%, #e6d5bd 100%);
+}
+
+/* ---------- fixed wordmark, top-left ---------- */
+.wordmark {
+  position: fixed;
+  top: clamp(1rem, 2.5vw, 1.75rem);
+  left: var(--gutter);
+  z-index: 20;
+  font-family: var(--font-d);
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  font-weight: 600;
+  letter-spacing: -.2px;
+  text-decoration: none;
+  color: var(--ink);
+  padding: .4rem .75rem .4rem 0;
+  transition: opacity .25s ease, transform .25s ease;
+}
+.wordmark span { color: var(--accent); }
+.wordmark:hover { transform: translateY(-1px); opacity: .78; }
+.wordmark::after {
+  content: '→';
+  display: inline-block;
+  margin-left: .35em;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity .25s ease, transform .25s ease;
+  color: var(--ink2);
+}
+.wordmark:hover::after { opacity: 1; transform: translateX(0); }
+
+/* ---------- screen one: the card ---------- */
+#card {
+  position: relative;
+  z-index: 1;
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+  padding: 6rem var(--gutter) 5rem;
+}
+
+/* soft warm scrim so the identity stays legible wherever the light lands */
+.card-inner { position: relative; max-width: 34rem; }
+.card-inner::before {
+  content: '';
+  position: absolute;
+  inset: -18% -22% -14% -26%;
+  background: radial-gradient(60% 55% at 38% 50%,
+    rgba(var(--bg-rgb), .92) 0%,
+    rgba(var(--bg-rgb), .68) 45%,
+    rgba(var(--bg-rgb), 0) 100%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.eyebrow {
+  margin: 0 0 1.25rem;
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: var(--eyebrow-ls);
+  text-transform: uppercase;
+  color: var(--ink2);
+}
+
+.name {
+  margin: 0 0 1.75rem;
+  font-family: var(--font-d);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 11vw, 5rem);
+  line-height: .96;
+  letter-spacing: -1.5px;
+  perspective: 600px;
+}
+.name .word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.name .char {
+  display: inline-block;
+  transform-origin: 50% 100%;
+  will-change: transform, opacity;
+}
+.name .space { display: inline-block; width: .28em; }
+
+.lines { margin: 0 0 2.25rem; padding: 0; list-style: none; }
+.lines li { overflow: hidden; }
+.lines li + li { margin-top: .1rem; }
+.lines a {
+  display: inline-block;
+  padding: .3rem 0;
+  font-size: clamp(1rem, 3.6vw, 1.1rem);
+  color: var(--ink);
+  text-decoration: none;
+  will-change: transform, opacity;
+  transition: color .2s ease;
+}
+.lines a::after {
+  content: '';
+  display: block;
+  height: 1px;
+  margin-top: .15rem;
+  background: currentColor;
+  opacity: .18;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform .35s cubic-bezier(.22, 1, .36, 1), opacity .2s ease;
+}
+.lines a:hover { color: var(--accent); }
+.lines a:hover::after { transform: scaleX(1); opacity: .5; }
+.lines .tel { font-variant-numeric: tabular-nums; letter-spacing: .3px; }
+
+.save {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  padding: .95rem 1.6rem;
+  border-radius: var(--btn-radius);
+  background: var(--accent);
+  color: #fff;
+  font-weight: 500;
+  font-size: .95rem;
+  text-decoration: none;
+  box-shadow: var(--shadow-1);
+  will-change: transform, opacity;
+  transition: transform .22s ease, background .22s ease;
+}
+.save:hover { transform: translateY(-2px); background: rgb(138 44 33); }
+.save svg { width: 1.05em; height: 1.05em; }
+
+/* ---------- scroll cue ---------- */
+.scroll-cue {
+  position: absolute;
+  left: var(--gutter);
+  bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .7rem;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: rgba(255, 250, 242, .82);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, .45);
+}
+.scroll-cue i {
+  transform-origin: 50% 0;
+  display: block;
+  width: 1px;
+  height: 2rem;
+  background: linear-gradient(to bottom, rgba(255, 250, 242, .8), rgba(255, 250, 242, 0));
+}
+
+/* ---------- screen two: the company ---------- */
+#about {
+  position: relative;
+  z-index: 2;
+  background: var(--bg);
+  padding: clamp(4.5rem, 12vh, 8rem) var(--gutter) 3rem;
+  border-top: 1px solid var(--border);
+}
+.wrap { max-width: 64rem; margin: 0 auto; }
+
+.sec-eyebrow {
+  margin: 0 0 .9rem;
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: var(--eyebrow-ls);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.sec-title {
+  margin: 0 0 1.5rem;
+  font-family: var(--font-d);
+  font-weight: 400;
+  font-size: clamp(2rem, 6vw, 3.1rem);
+  line-height: 1.05;
+  letter-spacing: -1px;
+}
+.lede { max-width: 44rem; }
+.lede p {
+  margin: 0 0 1.1rem;
+  font-size: clamp(1rem, 2.4vw, 1.1rem);
+  color: var(--ink2);
+}
+.lede strong { color: var(--ink); font-weight: 600; }
+
+.do-grid {
+  margin-top: clamp(2.5rem, 7vh, 4rem);
+  display: grid;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+}
+.do-item { background: var(--card); padding: 1.6rem 1.5rem; }
+.do-item h3 {
+  margin: 0 0 .5rem;
+  font-family: var(--font-d);
+  font-weight: 600;
+  font-size: 1.02rem;
+  letter-spacing: -.2px;
+}
+.do-item p { margin: 0; font-size: .9rem; color: var(--ink2); line-height: 1.55; }
+
+.reveal { will-change: transform, opacity; }
+
+footer {
+  max-width: 64rem;
+  margin: clamp(3rem, 9vh, 5rem) auto 0;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem 1.5rem;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: .8rem;
+  color: var(--ink2);
+}
+footer a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--border); }
+footer a:hover { border-color: var(--accent); color: var(--accent); }
+.disclaimer { max-width: 34rem; opacity: .8; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .reveal, .scroll-cue { opacity: 1 !important; }
+}
+
+/* ---------- motion is gated on JS ----------
+   Without JS none of these rules apply, so every element renders visible and
+   the card still works as a plain contact page. intro.ts unhides .name the
+   moment it has split it into per-char spans, so there is no flash of
+   un-animated text. */
+html.js .name,
+html.js .lines a,
+html.js .save,
+html.js .scroll-cue,
+html.js .reveal { opacity: 0; }
+
+@media (max-width: 760px) {
+  /* Anchor the identity to the lower third so the framed print, which sits
+     mid-frame in portrait, never lands behind the phone number. */
+  #card {
+    align-content: end;
+    padding-bottom: 5.5rem;
+  }
+
+  /* the room fills the whole frame behind full-width type, so the scrim
+     works harder here than it does on a wide screen */
+  .card-inner::before {
+    inset: -14% -40% -10% -40%;
+    background: radial-gradient(78% 58% at 42% 50%,
+      rgba(var(--bg-rgb), .95) 0%,
+      rgba(var(--bg-rgb), .82) 52%,
+      rgba(var(--bg-rgb), 0) 100%);
+  }
+}

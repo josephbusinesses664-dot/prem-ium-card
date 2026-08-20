@@ -1,0 +1,108 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+/* Company copy condensed from prem-ium.online's own src/data/site.ts so the
+   two sites never drift into saying different things. */
+const doItems = [
+  {
+    title: 'Local business websites',
+    body: 'Fast, mobile-first sites for plumbers, salons, auto shops — custom-designed, not templated. Your site actually looks like yours.',
+  },
+  {
+    title: 'Custom web applications',
+    body: 'Client portals, dashboards, booking systems and internal tools, built clean on Node/Express with GitHub + JWT auth.',
+  },
+  {
+    title: 'Analytics & SEO',
+    body: 'Google Analytics 4 on every site, location-keyworded SEO, and real visitor data surfaced in a dashboard built for non-technical owners.',
+  },
+  {
+    title: 'Conversion tracking & ad pixels',
+    body: 'Meta Pixel + Conversions API and GA4 events wired in, so ad spend and leads are actually measurable.',
+  },
+  {
+    title: 'Self-serve client portal',
+    body: 'Every site ships with a portal so owners edit text and swap images themselves — GitHub-backed, auto-deployed, no developer needed.',
+  },
+  {
+    title: 'Automations & alerts',
+    body: 'Auto-deploys straight from GitHub, Discord alerts on new leads or issues, and scripted outreach — the busywork runs itself.',
+  },
+];
+---
+
+<Layout
+  title="Prem Tamanam — prem-ium.inc"
+  description="Contact card for Prem Tamanam of prem-ium.inc — phone, email, and a one-tap vCard download."
+>
+  <a class="wordmark" href="https://prem-ium.online">prem-ium<span>.inc</span></a>
+
+  <canvas id="room" aria-hidden="true"></canvas>
+
+  <main>
+    <section id="card">
+      <div class="card-inner">
+        <h1 class="name">Prem Tamanam</h1>
+
+        <ul class="lines">
+          <li><a class="tel" href="tel:+16572009614">657&thinsp;200&thinsp;9614</a></li>
+          <li><a href="mailto:premnm01@icloud.com">premnm01@icloud.com</a></li>
+          <li><a href="mailto:hello@prem-ium.online">hello@prem-ium.online</a></li>
+        </ul>
+
+        <a class="save" href="/prem-tamanam.vcf" download="prem-tamanam.vcf">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          Save to contacts
+        </a>
+      </div>
+
+      <div class="scroll-cue" aria-hidden="true"><i></i> scroll</div>
+    </section>
+
+    <section id="about">
+      <div class="wrap">
+        <p class="sec-eyebrow reveal">prem-ium.inc</p>
+        <h2 class="sec-title reveal">Websites that make small businesses look big.</h2>
+
+        <div class="lede">
+          <p class="reveal">
+            <strong>prem-ium.inc</strong> builds fast, custom-designed websites for local businesses —
+            from the first wireframe to the final deploy. Plumbers, salons, auto shops, groomers,
+            tailors, jewelers: most small businesses either have no website, or one that hasn't been
+            touched since 2014.
+          </p>
+          <p class="reveal">
+            We fix that. Real design, real copy, GitHub + CI/CD under the hood, and a client portal so
+            owners can edit their own site without calling anyone. Every site ships with analytics,
+            SEO and conversion tracking wired in from day one.
+          </p>
+        </div>
+
+        <h3 class="sec-eyebrow reveal" style="margin-top:clamp(2.5rem,7vh,4rem)">What we do</h3>
+        <div class="do-grid">
+          {doItems.map((item) => (
+            <div class="do-item reveal">
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </div>
+          ))}
+        </div>
+
+        <footer>
+          <p class="disclaimer">
+            prem-ium.inc is a personal portfolio and small independent practice, not a registered business.
+          </p>
+          <p><a href="https://prem-ium.online">prem-ium.online&nbsp;→</a></p>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    import '../scripts/room';
+    import '../scripts/intro';
+  </script>
+</Layout>

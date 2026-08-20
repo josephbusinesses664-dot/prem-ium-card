@@ -1,0 +1,19 @@
+{
+  "name": "prem-ium-card",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "animejs": "^4.5.0",
+    "astro": "^7.2.4",
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^25.8.0"
+  }
+}
