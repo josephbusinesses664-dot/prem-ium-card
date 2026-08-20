@@ -80,7 +80,8 @@ function initRose(canvas: HTMLCanvasElement) {
   /* ---------- interaction ---------- */
   const ptr = { x: 0, y: 0 };
   const ptrTarget = { x: 0, y: 0 };
-  let scrollP = 0;
+  let scrollP = 0;   // raw scroll progress
+  let scrollLag = 0; // eased behind it, so the rose drifts rather than tracks
 
   if (!reduceMotion) {
     window.addEventListener('pointermove', (e) => {
@@ -119,25 +120,39 @@ function initRose(canvas: HTMLCanvasElement) {
     camera.updateProjectionMatrix();
   }
 
+  let lastT = 0;
+
   function frame(t: number) {
     requestAnimationFrame(frame);
-    if (document.hidden || window.scrollY > window.innerHeight * 1.25) return;
 
-    ptr.x += (ptrTarget.x - ptr.x) * 0.05;
-    ptr.y += (ptrTarget.y - ptr.y) * 0.05;
+    // seconds since the last frame, clamped so a background tab that wakes up
+    // after a long pause doesn't snap everything forward in one jump
+    const dt = Math.min(0.05, lastT ? (t - lastT) / 1000 : 0.016);
+    lastT = t;
+    // a little past the fold, so the trailing motion can finish settling
+    if (document.hidden || window.scrollY > window.innerHeight * 1.7) return;
+
+    // The rose lags the page. Easing toward the scroll position rather than
+    // reading it directly is what makes it feel like it is further away.
+    scrollLag += (scrollP - scrollLag) * (1 - Math.exp(-2.1 * dt));
+
+    // exponential damping: identical feel regardless of refresh rate
+    const ease = 1 - Math.exp(-3.2 * dt);
+    ptr.x += (ptrTarget.x - ptr.x) * ease;
+    ptr.y += (ptrTarget.y - ptr.y) * ease;
 
     const time = t * 0.001;
 
     // scroll spins the bloom up and sheds it; the opaque next section then
     // slides over the top, so the rose reads as sinking underneath it
-    shedPetals(scrollP);
-    const twirl = Math.pow(scrollP, 1.35) * 9.5;
+    shedPetals(scrollLag);
+    const twirl = Math.pow(scrollLag, 1.35) * 6.0;
 
     rose.rotation.y = time * 0.16 + ptr.x * 0.5 + twirl;
     rose.rotation.x = -0.24 + ptr.y * 0.35 + Math.sin(time * 0.5) * 0.03;
     rose.rotation.z = Math.sin(time * 0.37) * 0.035;
     rose.position.y =
-      (window.innerWidth < 760 ? 1.2 : 0.35) + Math.sin(time * 0.7) * 0.06 - scrollP * 2.3;
+      (window.innerWidth < 760 ? 1.2 : 0.35) + Math.sin(time * 0.7) * 0.06 - scrollLag * 1.35;
 
     motes.update(time);
     renderer.render(scene, camera);
@@ -156,37 +171,28 @@ function initRose(canvas: HTMLCanvasElement) {
    *  petal from the first frame would cost sorting for no visual gain. */
   function shedPetals(p: number) {
     for (const petal of petals) {
-      const local = Math.min(1, Math.max(0, (p - petal.release) / 0.34));
+      const local = Math.min(1, Math.max(0, (p - petal.release) / 0.52));
 
       if (local <= 0) {
-        if (petal.mat.transparent) {
-          petal.mat.transparent = false;
-          petal.mat.opacity = 1;
-          petal.mat.needsUpdate = true;
-        }
+        petal.mat.opacity = 1;
         petal.mesh.position.copy(petal.homePos);
         petal.mesh.rotation.copy(petal.homeRot);
         petal.mesh.visible = true;
         continue;
       }
 
-      if (!petal.mat.transparent) {
-        petal.mat.transparent = true;
-        petal.mat.needsUpdate = true;
-      }
-
       petal.mesh.position
         .copy(petal.homePos)
-        .addScaledVector(petal.drift, local * 1.15);
-      petal.mesh.position.y -= 7.5 * local * local; // gravity
+        .addScaledVector(petal.drift, local * 0.85);
+      petal.mesh.position.y -= 3.0 * local * local; // gravity, deliberately gentle
 
       petal.mesh.rotation.set(
-        petal.homeRot.x + petal.spin.x * local * 3.4,
-        petal.homeRot.y + petal.spin.y * local * 3.4,
-        petal.homeRot.z + petal.spin.z * local * 3.4
+        petal.homeRot.x + petal.spin.x * local * 2.0,
+        petal.homeRot.y + petal.spin.y * local * 2.0,
+        petal.homeRot.z + petal.spin.z * local * 2.0
       );
 
-      const fade = 1 - Math.min(1, Math.max(0, (local - 0.42) / 0.5));
+      const fade = 1 - Math.min(1, Math.max(0, (local - 0.6) / 0.4));
       petal.mat.opacity = fade;
       petal.mesh.visible = fade > 0.01;
     }
@@ -207,7 +213,8 @@ function initRose(canvas: HTMLCanvasElement) {
 
     for (let i = 0; i <= rings; i++) {
       const u = i / rings;
-      const w = Math.pow(Math.sin(Math.PI * (0.12 + u * 0.72)), 0.55);
+      const baseTaper = Math.min(1, u * 3.1);
+      const w = Math.pow(Math.sin(Math.PI * (0.12 + u * 0.72)), 0.55) * baseTaper;
       for (let j = 0; j <= seg; j++) {
         const v = (j / seg) * 2 - 1;
         const x = v * w * 0.62;
@@ -263,6 +270,10 @@ function initRose(canvas: HTMLCanvasElement) {
         metalness: 0.0,
         side: THREE.DoubleSide,
         flatShading: true,
+        // Declared up front and never toggled: flipping `transparent` at
+        // runtime forces a shader recompile, and doing that per petal as each
+        // one releases is a guaranteed hitch mid-scroll.
+        transparent: true,
       });
 
       const petal = new THREE.Mesh(geo, mat);
@@ -300,10 +311,10 @@ function initRose(canvas: HTMLCanvasElement) {
 
     // receptacle, so the petals emerge from something rather than a point
     const hip = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(0.28, 0),
+      new THREE.IcosahedronGeometry(0.34, 0),
       new THREE.MeshStandardMaterial({ color: 0x3c5738, roughness: 0.82, flatShading: true })
     );
-    hip.position.y = -0.3;
+    hip.position.y = -0.26;
     hip.scale.set(1, 0.8, 1);
     group.add(hip);
 
