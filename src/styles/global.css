@@ -41,20 +41,27 @@ body {
 a { color: inherit; }
 
 /* ---------- the 3D room canvas ---------- */
-#room {
+#scene {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
   z-index: 0;
   display: block;
-  /* until three.js paints, show a warm ground so there is never a white flash */
-  background: linear-gradient(160deg, #f7efe2 0%, #efe2cf 55%, #e6d5bd 100%);
+  /* The canvas is drawn with alpha, so this gradient IS the backdrop: a warm
+     dark ground with a bloom-coloured glow behind where the rose sits, which
+     keeps the frame full rather than a flat field. */
+  background:
+    radial-gradient(58% 52% at 74% 40%, rgba(233, 120, 140, .30) 0%, rgba(233, 120, 140, 0) 62%),
+    radial-gradient(70% 60% at 12% 88%, rgba(224, 138, 60, .20) 0%, rgba(224, 138, 60, 0) 68%),
+    linear-gradient(158deg, #1d1311 0%, #26171a 46%, #120f0e 100%);
 }
 
 /* ---------- fixed wordmark, top-left ---------- */
 .wordmark {
-  position: fixed;
+  /* absolute, not fixed: a fixed wordmark stays put while the hero text
+     scrolls up underneath it, and the two collide. */
+  position: absolute;
   top: clamp(1rem, 2.5vw, 1.75rem);
   left: var(--gutter);
   z-index: 20;
@@ -63,11 +70,12 @@ a { color: inherit; }
   font-weight: 600;
   letter-spacing: -.2px;
   text-decoration: none;
-  color: var(--ink);
+  color: #faf7f2;
+  opacity: var(--hero-fade, 1);
   padding: .4rem .75rem .4rem 0;
   transition: opacity .25s ease, transform .25s ease;
 }
-.wordmark span { color: var(--accent); }
+.wordmark span { color: #f08a7a; }
 .wordmark:hover { transform: translateY(-1px); opacity: .78; }
 .wordmark::after {
   content: '→';
@@ -76,7 +84,7 @@ a { color: inherit; }
   opacity: 0;
   transform: translateX(-4px);
   transition: opacity .25s ease, transform .25s ease;
-  color: var(--ink2);
+  color: rgba(250, 247, 242, .6);
 }
 .wordmark:hover::after { opacity: 1; transform: translateX(0); }
 
@@ -84,6 +92,7 @@ a { color: inherit; }
 #card {
   position: relative;
   z-index: 1;
+  opacity: var(--hero-fade, 1);
   min-height: 100svh;
   display: grid;
   align-content: center;
@@ -95,11 +104,11 @@ a { color: inherit; }
 .card-inner::before {
   content: '';
   position: absolute;
-  inset: -18% -22% -14% -26%;
-  background: radial-gradient(60% 55% at 38% 50%,
-    rgba(var(--bg-rgb), .92) 0%,
-    rgba(var(--bg-rgb), .68) 45%,
-    rgba(var(--bg-rgb), 0) 100%);
+  inset: -20% -30% -16% -32%;
+  background: radial-gradient(62% 58% at 34% 52%,
+    rgba(12, 9, 8, .72) 0%,
+    rgba(12, 9, 8, .44) 48%,
+    rgba(12, 9, 8, 0) 100%);
   z-index: -1;
   pointer-events: none;
 }
@@ -117,9 +126,11 @@ a { color: inherit; }
   margin: 0 0 1.75rem;
   font-family: var(--font-d);
   font-weight: 400;
-  font-size: clamp(2.6rem, 11vw, 5rem);
-  line-height: .96;
-  letter-spacing: -1.5px;
+  font-size: clamp(2.9rem, 11.5vw, 5.4rem);
+  line-height: .95;
+  letter-spacing: -1.8px;
+  color: #fdfaf5;
+  text-shadow: 0 2px 40px rgba(0, 0, 0, .5);
   perspective: 600px;
 }
 .name .word {
@@ -133,14 +144,17 @@ a { color: inherit; }
 }
 .name .space { display: inline-block; width: .28em; }
 
-.lines { margin: 0 0 2.25rem; padding: 0; list-style: none; }
+.lines { margin: 0 0 2.5rem; padding: 0; list-style: none; }
 .lines li { overflow: hidden; }
-.lines li + li { margin-top: .1rem; }
+.lines li + li { margin-top: .28rem; }
 .lines a {
   display: inline-block;
-  padding: .3rem 0;
-  font-size: clamp(1rem, 3.6vw, 1.1rem);
-  color: var(--ink);
+  padding: .34rem 0;
+  font-size: clamp(1.18rem, 4.4vw, 1.5rem);
+  font-weight: 600;
+  letter-spacing: -.3px;
+  color: #fdfaf5;
+  text-shadow: 0 1px 18px rgba(0, 0, 0, .55);
   text-decoration: none;
   will-change: transform, opacity;
   transition: color .2s ease;
@@ -156,7 +170,7 @@ a { color: inherit; }
   transform-origin: 0 50%;
   transition: transform .35s cubic-bezier(.22, 1, .36, 1), opacity .2s ease;
 }
-.lines a:hover { color: var(--accent); }
+.lines a:hover { color: #ffb3a3; }
 .lines a:hover::after { transform: scaleX(1); opacity: .5; }
 .lines .tel { font-variant-numeric: tabular-nums; letter-spacing: .3px; }
 
@@ -164,12 +178,12 @@ a { color: inherit; }
   display: inline-flex;
   align-items: center;
   gap: .55rem;
-  padding: .95rem 1.6rem;
+  padding: 1.1rem 2rem;
   border-radius: var(--btn-radius);
   background: var(--accent);
   color: #fff;
-  font-weight: 500;
-  font-size: .95rem;
+  font-weight: 600;
+  font-size: 1.05rem;
   text-decoration: none;
   box-shadow: var(--shadow-1);
   will-change: transform, opacity;
@@ -189,8 +203,8 @@ a { color: inherit; }
   font-size: .7rem;
   letter-spacing: 1.6px;
   text-transform: uppercase;
-  color: rgba(255, 250, 242, .82);
-  text-shadow: 0 1px 12px rgba(0, 0, 0, .45);
+  color: rgba(255, 250, 242, .72);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, .5);
 }
 .scroll-cue i {
   transform-origin: 50% 0;
@@ -253,6 +267,22 @@ a { color: inherit; }
   letter-spacing: -.2px;
 }
 .do-item p { margin: 0; font-size: .9rem; color: var(--ink2); line-height: 1.55; }
+
+.lede-shot {
+  margin: clamp(2.5rem, 7vh, 3.5rem) 0 0;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  line-height: 0;
+}
+/* 1400x933 — the intrinsic ratio, so it is never squashed */
+.lede-shot img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1400 / 933;
+  object-fit: cover;
+  display: block;
+}
 
 .reveal { will-change: transform, opacity; }
 

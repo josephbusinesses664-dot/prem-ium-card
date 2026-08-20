@@ -37,7 +37,7 @@ const doItems = [
 >
   <a class="wordmark" href="https://prem-ium.online">prem-ium<span>.inc</span></a>
 
-  <canvas id="room" aria-hidden="true"></canvas>
+  <canvas id="scene" aria-hidden="true"></canvas>
 
   <main>
     <section id="card">
@@ -51,7 +51,7 @@ const doItems = [
           <li><a href="https://instagram.com/premnm_01" target="_blank" rel="noopener">@premnm_01</a></li>
         </ul>
 
-        <a class="save" href="/prem-tamanam.vcf" download="prem-tamanam.vcf">
+        <a class="save" href="/prem-tamanam.vcf">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 5v14M5 12h14" />
@@ -82,6 +82,10 @@ const doItems = [
           </p>
         </div>
 
+        <figure class="lede-shot reveal">
+          <img src="/flower.jpg" alt="" width="1400" height="933" loading="lazy" decoding="async" />
+        </figure>
+
         <h3 class="sec-eyebrow reveal" style="margin-top:clamp(2.5rem,7vh,4rem)">What we do</h3>
         <div class="do-grid">
           {doItems.map((item) => (
@@ -103,7 +107,7 @@ const doItems = [
   </main>
 
   <script>
-    import '../scripts/room';
+    import '../scripts/rose';
     import '../scripts/intro';
   </script>
 </Layout>

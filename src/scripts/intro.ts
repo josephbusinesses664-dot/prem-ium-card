@@ -13,6 +13,18 @@ const lines = utils.$('.lines a') as HTMLElement[];
 const save = document.querySelector<HTMLElement>('.save');
 const cue = document.querySelector<HTMLElement>('.scroll-cue');
 
+/* The wordmark and the identity are fixed/centred over a scene that sinks
+   away on scroll. Without fading them out they collide with each other and
+   then sit unreadable over the cream section below. */
+if (!reduce) {
+  const setHeroFade = () => {
+    const p = Math.min(1, window.scrollY / (window.innerHeight * 0.62));
+    document.documentElement.style.setProperty('--hero-fade', String(1 - p));
+  };
+  window.addEventListener('scroll', setHeroFade, { passive: true });
+  setHeroFade();
+}
+
 /* ---------- split the name into characters ---------- */
 const chars: HTMLElement[] = [];
 if (name) {
